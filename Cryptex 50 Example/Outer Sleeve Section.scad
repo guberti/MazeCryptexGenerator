@@ -4,7 +4,6 @@ IN_MM_CONVERSION = 25.4;
 options = len(data[0]);
 radius = 20;
 slice_height = (radius * 2 * PI)/len(data[0]);
-echo(slice_height);
 ang = 360/options;
 wall_radius = radius + slice_height;
 bottom_thickness = 8;
@@ -12,42 +11,15 @@ pvc_outer_radius = ((2.375)/2 * IN_MM_CONVERSION);
 pvc_inner_radius = ((2.047)/2 * IN_MM_CONVERSION);
 handle_radius = pvc_outer_radius + slice_height + 1;
 indentation_depth = 5;
-
-module pie_slice(r,a) {
-    $fn=52*4;
-    scale([1, 1, 1]) {
-        linear_extrude(height=slice_height) {
-            intersection() {
-                circle(r=r);
-                square(r);
-                rotate(a-90) square(r);
-            }
-        }
-    }
-}
-
-union () {
-
-translate ([0, 0, bottom_thickness]){ difference() {
-    union() {
-        for (s = [0:len(data)-1]) {
-            for (l = [0:len(data[0])-1]) {
-                if (data[s][l] == true) {
-                    translate([0,0,slice_height*s])
-                    rotate([0,0,ang*l]) pie_slice(r=wall_radius, a=ang);
-                } else {
-                    translate([0,0,slice_height*s])
-                    rotate([0,0,ang*l]) pie_slice(r=radius, a=ang);
-                }
-            }
-        }
-    }
-    translate([0, 0, bottom_thickness]) cylinder(h=slice_height*len(data),r=radius-slice_height, $fn=208);
-}}
+echo(pvc_inner_radius);
+echo(wall_radius);
+echo(len(data));
+echo(len(data[0]));
 difference() {
-    cylinder(h=bottom_thickness, r=handle_radius, $fn=12);
-    translate([0, 0, bottom_thickness - indentation_depth]) cylinder(h=indentation_depth+1, r=pvc_outer_radius);
-}
-cylinder(h=bottom_thickness, r=pvc_inner_radius, $fn=208);
-}
+    cylinder(h=10, r=pvc_inner_radius-.4);
 
+    cylinder(h=20,r=wall_radius+.4);
+}
+translate([21, 0, slice_height*3])
+rotate([0, 90, 0])
+cylinder(r=1,h=2,$fn=208);
